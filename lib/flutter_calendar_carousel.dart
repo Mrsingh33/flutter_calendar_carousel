@@ -503,6 +503,7 @@ class _CalendarState<T extends EventInterface>
                             ),
                           )
                         : RoundedRectangleBorder(
+                                            borderRadius:  BorderRadius.all( Radius.circular(4)),
                             side: BorderSide(
                               color: isSelectedDay
                                   ? widget.selectedDayBorderColor

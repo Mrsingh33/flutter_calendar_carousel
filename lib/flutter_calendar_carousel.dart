@@ -115,6 +115,10 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
   final bool showHeader;
   final bool showHeaderButton;
   final MultipleMarkedDates? multipleMarkedDates;
+  final MultipleMarkedDates? presentDates;
+  final MultipleMarkedDates? absentDates;
+  final MultipleMarkedDates? onLeaveDates;
+  final MultipleMarkedDates? holidayDates;
   final Widget? leftButtonIcon;
   final Widget? rightButtonIcon;
   final ScrollPhysics? customGridViewPhysics;
@@ -156,8 +160,8 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
     this.width = double.infinity,
     this.todayTextStyle,
     this.dayButtonColor = Colors.transparent,
-    this.todayBorderColor = Colors.red,
-    this.todayButtonColor = Colors.red,
+    this.todayBorderColor = Colors.transparent,
+    this.todayButtonColor = Colors.transparent,
     this.selectedDateTime,
     this.targetDateTime,
     this.selectedDayTextStyle,
@@ -185,6 +189,10 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
     this.markedDateMoreCustomTextStyle,
     this.markedDateWidget,
     this.multipleMarkedDates,
+    this.absentDates,
+    this.presentDates,
+    this.holidayDates,
+    this.onLeaveDates,
     this.headerMargin = const EdgeInsets.symmetric(vertical: 16.0),
     this.childAspectRatio = 1.0,
     this.weekDayMargin = const EdgeInsets.only(bottom: 4.0),
@@ -473,9 +481,20 @@ class _CalendarState<T extends EventInterface>
   ) {
     // If day is in Multiple selection mode, get its color
     bool isMultipleMarked = widget.multipleMarkedDates?.isMarked(now) ?? false;
+    bool isPresentDayMarked = widget.presentDates?.isMarked(now) ?? false;
+    bool isAbsentDayMarked = widget.absentDates?.isMarked(now) ?? false;
+    bool isHolidayDayMarked = widget.holidayDates?.isMarked(now) ?? false;
+    bool isOnLeaveDayMarked = widget.holidayDates?.isMarked(now) ?? false;
+
+    /// to get colours
     Color? multipleMarkedColor = widget.multipleMarkedDates?.getColor(now);
+    Color? PresentDayMarked = widget.presentDates?.getColor(now);
+    Color? AbsentDayMarked = widget.absentDates?.getColor(now);
+    Color? HolidayDayMarked = widget.holidayDates?.getColor(now);
+    Color? OnLeaveDayMarked = widget.holidayDates?.getColor(now);
 
     final markedDatesMap = widget.markedDatesMap;
+    print(' isToday  $isToday ${widget.todayBorderColor.toString()}');
     return Container(
       margin: EdgeInsets.all(widget.dayPadding),
       child: GestureDetector(
@@ -501,12 +520,12 @@ class _CalendarState<T extends EventInterface>
                                               ? widget.nextMonthDayBorderColor
                                               : widget.thisMonthDayBorderColor,
                             ),
-                          ) : isToday ? null
+                          )
                         : RoundedRectangleBorder(
                          borderRadius:  BorderRadius.all( Radius.circular(4)),
                             side: BorderSide(
 
-                              width: isSelectedDay ? 1.5 : 1,
+                              width: 2,
 
                               color: isSelectedDay
                                   ? widget.selectedDayBorderColor
@@ -526,7 +545,11 @@ class _CalendarState<T extends EventInterface>
 
                     // If day is in Multiple selection mode, apply a different color
                     : isMultipleMarked
-                        ? multipleMarkedColor
+                        ? multipleMarkedColor :
+                        isPresentDayMarked ? PresentDayMarked :
+                            isAbsentDayMarked ? AbsentDayMarked :
+                                isOnLeaveDayMarked ? OnLeaveDayMarked :
+                                    isHolidayDayMarked ? HolidayDayMarked
                         : widget.dayButtonColor,
             padding: EdgeInsets.all(widget.dayPadding),
           ),
@@ -633,6 +656,7 @@ class _CalendarState<T extends EventInterface>
                       DateTime.now().day == index + 1 - _startWeekday &&
                           DateTime.now().month == month &&
                           DateTime.now().year == year;
+
                   bool isSelectedDay = selectedDateTime != null &&
                       selectedDateTime.year == year &&
                       selectedDateTime.month == month &&
@@ -1129,6 +1153,8 @@ class _CalendarState<T extends EventInterface>
       bool isNextMonthDay,
       bool isThisMonthDay,
       DateTime now) {
+
+    print((index - 1 + firstDayOfWeek) % 7);
     // If day is in multiple selection get its style(if available)
     bool isMultipleMarked = widget.multipleMarkedDates?.isMarked(now) ?? false;
     TextStyle? mutipleMarkedTextStyle =

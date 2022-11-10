@@ -79,6 +79,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
   final TextStyle? headerTextStyle;
   final String? headerText;
   final TextStyle? weekendTextStyle;
+  final Color? dividerColor;
   final EventList<T>? markedDatesMap;
 
   /// Change `makredDateWidget` when `markedDateShowIcon` is set to false.
@@ -230,6 +231,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
     this.showIconBehindDayText = false,
     this.pageScrollPhysics = const ScrollPhysics(),
     this.shouldShowTransform = true,
+    this.dividerColor
   }) : super(key: key);
 
   @override
@@ -392,6 +394,13 @@ class _CalendarState<T extends EventInterface>
             weekdayBackgroundColor: widget.weekDayBackgroundColor,
             weekdayTextStyle: widget.weekdayTextStyle,
             localeDate: _localeDate,
+          ),
+          Divider(
+            color: widget.dividerColor,
+            thickness:  1.5,
+            indent:  3,
+            endIndent: 3,
+
           ),
           Expanded(
               child: PageView.builder(
@@ -1154,7 +1163,7 @@ class _CalendarState<T extends EventInterface>
       bool isThisMonthDay,
       DateTime now) {
 
-    print((index - 1 + firstDayOfWeek) % 7);
+    // print((index - 1 + firstDayOfWeek) % 7);
     // If day is in multiple selection get its style(if available)
     bool isMultipleMarked = widget.multipleMarkedDates?.isMarked(now) ?? false;
     TextStyle? mutipleMarkedTextStyle =
